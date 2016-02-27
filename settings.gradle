@@ -1,1 +1,1 @@
-include ':native_sample', ':libvlc'
+include ':native_sample', ':java_sample', ':libvlc'
