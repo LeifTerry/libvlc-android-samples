@@ -42,6 +42,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
     private static final int SURFACE_ORIGINAL = 6;
     private static int CURRENT_SIZE = SURFACE_BEST_FIT;
 
+    private boolean mNativeStarted = false;
     private AWindow mAWindow = null;
     private SurfaceView mUiSurface = null;
     private FrameLayout mVideoSurfaceFrame = null;
@@ -151,12 +152,6 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
             mAWindow.setSubtitlesView(mSubtitlesSurface);
         mAWindow.attachViews();
 
-        if (!nativeStart(mAWindow.getNativeHandler())) {
-            Toast.makeText(this, "Couldn't start LibVLC", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
         hide();
 
         if (mOnLayoutChangeListener == null) {
@@ -189,7 +184,8 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
             mOnLayoutChangeListener = null;
         }
 
-        nativeStop();
+        if (mNativeStarted)
+            nativeStop();
 
         mAWindow.detachViews();
     }
@@ -297,10 +293,20 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
 
     @Override
     public void onSurfacesCreated(IVLCVout vlcVout) {
+        if (!mNativeStarted) {
+            if (!nativeStart(mAWindow.getNativeHandler())) {
+                Toast.makeText(this, "Couldn't start LibVLC", Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+        }
+        mNativeStarted = true;
     }
 
     @Override
     public void onSurfacesDestroyed(IVLCVout vlcVout) {
+        if (mNativeStarted)
+            nativeStop();
     }
 
     @Override
