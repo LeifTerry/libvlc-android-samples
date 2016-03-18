@@ -13,6 +13,7 @@ package org.videolan.nativesample;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import org.videolan.libvlc.AWindow;
 import org.videolan.libvlc.AWindowNativeHandler;
 import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.util.HWDecoderUtil;
 
 @SuppressWarnings("JniMissingFunction")
 public class NativeActivity extends AppCompatActivity implements IVLCVout.Callback {
@@ -114,9 +116,11 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         mUiSurface = (SurfaceView) findViewById(R.id.ui_surface);
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
         mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
-        if (ENABLE_SUBTITLES) {
+        if (ENABLE_SUBTITLES && HWDecoderUtil.HAS_SUBTITLES_SURFACE) {
             final ViewStub stub = (ViewStub) findViewById(R.id.subtitles_stub);
             mSubtitlesSurface = (SurfaceView) stub.inflate();
+            mSubtitlesSurface.setZOrderMediaOverlay(true);
+            mSubtitlesSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         }
         if (!nativeCreate()) {
             Toast.makeText(this, "Couldn't create LibVLC", Toast.LENGTH_LONG).show();

@@ -13,6 +13,7 @@ package org.videolan.javasample;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,7 @@ import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
+import org.videolan.libvlc.util.HWDecoderUtil;
 
 import java.util.ArrayList;
 
@@ -76,9 +78,11 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         mUiSurface = (SurfaceView) findViewById(R.id.ui_surface);
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
         mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
-        if (ENABLE_SUBTITLES) {
+        if (ENABLE_SUBTITLES && HWDecoderUtil.HAS_SUBTITLES_SURFACE) {
             final ViewStub stub = (ViewStub) findViewById(R.id.subtitles_stub);
             mSubtitlesSurface = (SurfaceView) stub.inflate();
+            mSubtitlesSurface.setZOrderMediaOverlay(true);
+            mSubtitlesSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         }
     }
 
