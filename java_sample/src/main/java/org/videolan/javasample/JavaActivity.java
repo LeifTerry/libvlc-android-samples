@@ -47,7 +47,6 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
     private static final int SURFACE_ORIGINAL = 6;
     private static int CURRENT_SIZE = SURFACE_BEST_FIT;
 
-    private SurfaceView mUiSurface = null;
     private FrameLayout mVideoSurfaceFrame = null;
     private SurfaceView mVideoSurface = null;
     private SurfaceView mSubtitlesSurface = null;
@@ -75,7 +74,6 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         mLibVLC = new LibVLC(args);
         mMediaPlayer = new MediaPlayer(mLibVLC);
 
-        mUiSurface = (SurfaceView) findViewById(R.id.ui_surface);
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
         mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
         if (ENABLE_SUBTITLES && HWDecoderUtil.HAS_SUBTITLES_SURFACE) {

@@ -6,11 +6,6 @@
     android:background="@android:color/background_dark"
     tools:context=".NativeActivity">
 
-    <SurfaceView
-        android:id="@+id/ui_surface"
-        android:layout_width="1dp"
-        android:layout_height="1dp" />
-
     <FrameLayout
         android:id="@+id/video_surface_frame"
         android:layout_width="wrap_content"
