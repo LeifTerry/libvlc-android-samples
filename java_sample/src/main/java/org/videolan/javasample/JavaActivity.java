@@ -13,6 +13,7 @@ package org.videolan.javasample;
 import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback {
     private static final boolean ENABLE_SUBTITLES = true;
     private static final String TAG = "JavaActivity";
-    private static final String SAMPLE_PATH = "/sdcard/Movies/sample.mp4";
+    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
     private static final int SURFACE_BEST_FIT = 0;
     private static final int SURFACE_FIT_HORIZONTAL = 1;
     private static final int SURFACE_FIT_VERTICAL = 2;
@@ -99,7 +100,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         vlcVout.attachViews();
         mMediaPlayer.getVLCVout().addCallback(this);
 
-        Media media = new Media(mLibVLC, SAMPLE_PATH);
+        Media media = new Media(mLibVLC, Uri.parse(SAMPLE_URL));
         mMediaPlayer.setMedia(media);
         media.release();
         mMediaPlayer.play();
