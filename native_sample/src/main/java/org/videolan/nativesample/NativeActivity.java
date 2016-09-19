@@ -66,7 +66,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         if (sInit != -1)
             return sInit == 1;
 
-        System.loadLibrary("compat.7");
+        System.loadLibrary("c++_shared");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
             try {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1)
