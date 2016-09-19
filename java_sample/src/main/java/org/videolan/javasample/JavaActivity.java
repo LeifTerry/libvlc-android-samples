@@ -101,7 +101,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
             vlcVout.setSubtitlesView(mSubtitlesSurface);
         vlcVout.attachViews();
         mMediaPlayer.getVLCVout().addCallback(this);
-        
+
         Media media = new Media(mLibVLC, SAMPLE_PATH);
         mMediaPlayer.setMedia(media);
         media.release();
