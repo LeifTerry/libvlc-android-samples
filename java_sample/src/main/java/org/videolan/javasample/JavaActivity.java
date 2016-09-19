@@ -11,7 +11,6 @@
 package org.videolan.javasample;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -24,13 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
-import org.videolan.libvlc.util.HWDecoderUtil;
 
 import java.util.ArrayList;
 
@@ -71,12 +68,12 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
 
         final ArrayList<String> args = new ArrayList<>();
         args.add("-vvv");
-        mLibVLC = new LibVLC(args);
+        mLibVLC = new LibVLC(this, args);
         mMediaPlayer = new MediaPlayer(mLibVLC);
 
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
         mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
-        if (ENABLE_SUBTITLES && HWDecoderUtil.HAS_SUBTITLES_SURFACE) {
+        if (ENABLE_SUBTITLES) {
             final ViewStub stub = (ViewStub) findViewById(R.id.subtitles_stub);
             mSubtitlesSurface = (SurfaceView) stub.inflate();
             mSubtitlesSurface.setZOrderMediaOverlay(true);
@@ -250,9 +247,5 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
 
     @Override
     public void onSurfacesDestroyed(IVLCVout vlcVout) {
-    }
-
-    @Override
-    public void onHardwareAccelerationError(IVLCVout vlcVout) {
     }
 }
