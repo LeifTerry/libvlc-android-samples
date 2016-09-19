@@ -14,7 +14,7 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_media_player.h>
 
-#define SAMPLE_TEST "/sdcard/Movies/sample.mp4"
+#define SAMPLE_URL "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v"
 
 static struct
 {
@@ -132,7 +132,7 @@ Java_org_videolan_nativesample_NativeActivity_nativeStart(
     p_ctx->jaWindow = (*p_env)->NewGlobalRef(p_env, jaWindow);
 
     libvlc_media_player_set_android_context(p_ctx->p_mp, p_ctx->jaWindow);
-    return PlayUrl(p_ctx, SAMPLE_TEST);
+    return PlayUrl(p_ctx, SAMPLE_URL);
 }
 
 void
