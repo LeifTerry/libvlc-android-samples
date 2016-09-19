@@ -29,7 +29,6 @@ import android.widget.Toast;
 import org.videolan.libvlc.AWindow;
 import org.videolan.libvlc.AWindowNativeHandler;
 import org.videolan.libvlc.IVLCVout;
-import org.videolan.libvlc.util.HWDecoderUtil;
 
 @SuppressWarnings("JniMissingFunction")
 public class NativeActivity extends AppCompatActivity implements IVLCVout.Callback {
@@ -116,7 +115,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         mUiSurface = (SurfaceView) findViewById(R.id.ui_surface);
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
         mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
-        if (ENABLE_SUBTITLES && HWDecoderUtil.HAS_SUBTITLES_SURFACE) {
+        if (ENABLE_SUBTITLES) {
             final ViewStub stub = (ViewStub) findViewById(R.id.subtitles_stub);
             mSubtitlesSurface = (SurfaceView) stub.inflate();
             mSubtitlesSurface.setZOrderMediaOverlay(true);
@@ -298,10 +297,6 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
             nativeStop();
     }
 
-    @Override
-    public void onHardwareAccelerationError(IVLCVout vlcVout) {
-    }
-    
     @SuppressWarnings("unused") // used by JNI
     private long mInstance;
     private native boolean nativeCreate();
