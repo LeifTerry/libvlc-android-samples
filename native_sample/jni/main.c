@@ -55,8 +55,6 @@ Java_org_videolan_nativesample_NativeActivity_nativeCreate(
 
     static const char *pp_argv[] = {
         "-vvv",
-        "--aout", "android_audiotrack",
-        "--androidwindow-chroma", "RV32",
         "--audio-resampler", "soxr",
     };
     p_ctx->p_libvlc = libvlc_new(sizeof(pp_argv)/sizeof(*pp_argv), pp_argv);

@@ -27,11 +27,11 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import org.videolan.libvlc.AWindow;
-import org.videolan.libvlc.AWindowNativeHandler;
 import org.videolan.libvlc.IVLCVout;
 
 @SuppressWarnings("JniMissingFunction")
-public class NativeActivity extends AppCompatActivity implements IVLCVout.Callback {
+public class NativeActivity extends AppCompatActivity implements IVLCVout.Callback,
+        IVLCVout.OnNewVideoLayoutListener {
     private static final boolean ENABLE_SUBTITLES = true;
     private static final String TAG = "NativeActivity";
     private static final int SURFACE_BEST_FIT = 0;
@@ -140,7 +140,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         mAWindow.setVideoView(mVideoSurface);
         if (mSubtitlesSurface != null)
             mAWindow.setSubtitlesView(mSubtitlesSurface);
-        mAWindow.attachViews();
+        mAWindow.attachViews(this);
 
         if (mOnLayoutChangeListener == null) {
             mOnLayoutChangeListener = new View.OnLayoutChangeListener() {
@@ -269,7 +269,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
-    public void onNewLayout(IVLCVout vlcVout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
+    public void onNewVideoLayout(IVLCVout vlcVout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
         mVideoWidth = width;
         mVideoHeight = height;
         mVideoVisibleWidth = visibleWidth;
@@ -282,7 +282,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
     @Override
     public void onSurfacesCreated(IVLCVout vlcVout) {
         if (!mNativeStarted) {
-            if (!nativeStart(mAWindow.getNativeHandler())) {
+            if (!nativeStart(mAWindow)) {
                 Toast.makeText(this, "Couldn't start LibVLC", Toast.LENGTH_LONG).show();
                 finish();
                 return;
@@ -301,6 +301,6 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
     private long mInstance;
     private native boolean nativeCreate();
     private native void nativeDestroy();
-    private native boolean nativeStart(AWindowNativeHandler aWindowNative);
+    private native boolean nativeStart(AWindow aWindowNative);
     private native void nativeStop();
 }

@@ -32,7 +32,7 @@ import org.videolan.libvlc.MediaPlayer;
 
 import java.util.ArrayList;
 
-public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback {
+public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVideoLayoutListener {
     private static final boolean ENABLE_SUBTITLES = true;
     private static final String TAG = "JavaActivity";
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
@@ -97,8 +97,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         vlcVout.setVideoView(mVideoSurface);
         if (mSubtitlesSurface != null)
             vlcVout.setSubtitlesView(mSubtitlesSurface);
-        vlcVout.attachViews();
-        mMediaPlayer.getVLCVout().addCallback(this);
+        vlcVout.attachViews(this);
 
         Media media = new Media(mLibVLC, Uri.parse(SAMPLE_URL));
         mMediaPlayer.setMedia(media);
@@ -138,7 +137,6 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         mMediaPlayer.stop();
 
         mMediaPlayer.getVLCVout().detachViews();
-        mMediaPlayer.getVLCVout().removeCallback(this);
     }
     private void updateVideoSurfaces() {
         if (mVideoWidth * mVideoHeight == 0)
@@ -232,7 +230,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
-    public void onNewLayout(IVLCVout vlcVout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
+    public void onNewVideoLayout(IVLCVout vlcVout, int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
         mVideoWidth = width;
         mVideoHeight = height;
         mVideoVisibleWidth = visibleWidth;
@@ -240,13 +238,5 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.Callback
         mVideoSarNum = sarNum;
         mVideoSarDen = sarDen;
         updateVideoSurfaces();
-    }
-
-    @Override
-    public void onSurfacesCreated(IVLCVout vlcVout) {
-    }
-
-    @Override
-    public void onSurfacesDestroyed(IVLCVout vlcVout) {
     }
 }
