@@ -37,12 +37,11 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
     private static final String TAG = "JavaActivity";
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
     private static final int SURFACE_BEST_FIT = 0;
-    private static final int SURFACE_FIT_HORIZONTAL = 1;
-    private static final int SURFACE_FIT_VERTICAL = 2;
-    private static final int SURFACE_FILL = 3;
-    private static final int SURFACE_16_9 = 4;
-    private static final int SURFACE_4_3 = 5;
-    private static final int SURFACE_ORIGINAL = 6;
+    private static final int SURFACE_FIT_SCREEN = 1;
+    private static final int SURFACE_FILL = 2;
+    private static final int SURFACE_16_9 = 3;
+    private static final int SURFACE_4_3 = 4;
+    private static final int SURFACE_ORIGINAL = 5;
     private static int CURRENT_SIZE = SURFACE_BEST_FIT;
 
     private FrameLayout mVideoSurfaceFrame = null;
@@ -181,11 +180,11 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
                 else
                     dw = dh * ar;
                 break;
-            case SURFACE_FIT_HORIZONTAL:
-                dh = dw / ar;
-                break;
-            case SURFACE_FIT_VERTICAL:
-                dw = dh * ar;
+            case SURFACE_FIT_SCREEN:
+                if (dar >= ar)
+                    dh = dw / ar; /* horizontal */
+                else
+                    dw = dh * ar; /* vertical */
                 break;
             case SURFACE_FILL:
                 break;
