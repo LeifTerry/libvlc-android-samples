@@ -137,25 +137,103 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
 
         mMediaPlayer.getVLCVout().detachViews();
     }
+
+    private void changeMediaPlayerLayout(int displayW, int displayH) {
+        /* Change the video placement using the MediaPlayer API */
+        switch (CURRENT_SIZE) {
+            case SURFACE_BEST_FIT:
+                mMediaPlayer.setAspectRatio(null);
+                mMediaPlayer.setScale(0);
+                break;
+            case SURFACE_FIT_SCREEN:
+            case SURFACE_FILL: {
+                Media.VideoTrack vtrack = mMediaPlayer.getCurrentVideoTrack();
+                if (vtrack == null)
+                    return;
+                final boolean videoSwapped = vtrack.orientation == Media.VideoTrack.Orientation.LeftBottom
+                        || vtrack.orientation == Media.VideoTrack.Orientation.RightTop;
+                if (CURRENT_SIZE == SURFACE_FIT_SCREEN) {
+                    int videoW = vtrack.width;
+                    int videoH = vtrack.height;
+
+                    if (videoSwapped) {
+                        int swap = videoW;
+                        videoW = videoH;
+                        videoH = swap;
+                    }
+                    if (vtrack.sarNum != vtrack.sarDen)
+                        videoW = videoW * vtrack.sarNum / vtrack.sarDen;
+
+                    float ar = videoW / (float) videoH;
+                    float dar = displayW / (float) displayH;
+
+                    float scale;
+                    if (dar >= ar)
+                        scale = displayW / (float) videoW; /* horizontal */
+                    else
+                        scale = displayH / (float) videoH; /* vertical */
+                    mMediaPlayer.setScale(scale);
+                    mMediaPlayer.setAspectRatio(null);
+                } else {
+                    mMediaPlayer.setScale(0);
+                    mMediaPlayer.setAspectRatio(!videoSwapped ? ""+displayW+":"+displayH
+                            : ""+displayH+":"+displayW);
+                }
+                break;
+            }
+            case SURFACE_16_9:
+                mMediaPlayer.setAspectRatio("16:9");
+                mMediaPlayer.setScale(0);
+                break;
+            case SURFACE_4_3:
+                mMediaPlayer.setAspectRatio("4:3");
+                mMediaPlayer.setScale(0);
+                break;
+            case SURFACE_ORIGINAL:
+                mMediaPlayer.setAspectRatio(null);
+                mMediaPlayer.setScale(1);
+                break;
+        }
+    }
+
     private void updateVideoSurfaces() {
-        if (mVideoWidth * mVideoHeight == 0)
-            return;
         int sw = getWindow().getDecorView().getWidth();
         int sh = getWindow().getDecorView().getHeight();
 
+        // sanity check
+        if (sw * sh == 0) {
+            Log.e(TAG, "Invalid surface size");
+            return;
+        }
+
         mMediaPlayer.getVLCVout().setWindowSize(sw, sh);
+
+        ViewGroup.LayoutParams lp = mVideoSurface.getLayoutParams();
+        if (mVideoWidth * mVideoHeight == 0) {
+            /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
+            lp.width  = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            mVideoSurface.setLayoutParams(lp);
+            lp = mVideoSurfaceFrame.getLayoutParams();
+            lp.width  = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            mVideoSurfaceFrame.setLayoutParams(lp);
+            changeMediaPlayerLayout(sw, sh);
+            return;
+        }
+
+        if (lp.width == lp.height && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+            /* We handle the placement of the video using Android View LayoutParams */
+            mMediaPlayer.setAspectRatio(null);
+            mMediaPlayer.setScale(0);
+        }
+
         double dw = sw, dh = sh;
         final boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
         if (sw > sh && isPortrait || sw < sh && !isPortrait) {
             dw = sh;
             dh = sw;
-        }
-
-        // sanity check
-        if (dw * dh == 0) {
-            Log.e(TAG, "Invalid surface size");
-            return;
         }
 
         // compute the aspect ratio
@@ -209,7 +287,6 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         }
 
         // set display size
-        ViewGroup.LayoutParams lp = mVideoSurface.getLayoutParams();
         lp.width  = (int) Math.ceil(dw * mVideoWidth / mVideoVisibleWidth);
         lp.height = (int) Math.ceil(dh * mVideoHeight / mVideoVisibleHeight);
         mVideoSurface.setLayoutParams(lp);
