@@ -16,6 +16,16 @@
 
 #define SAMPLE_URL "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v"
 
+enum surface_layout
+{
+    SURFACE_BEST_FIT,
+    SURFACE_16_9,
+    SURFACE_4_3,
+    SURFACE_ORIGINAL,
+};
+
+static const enum surface_layout surface_layout = SURFACE_BEST_FIT;
+
 static struct
 {
     struct {
@@ -89,6 +99,30 @@ Java_org_videolan_nativesample_NativeActivity_nativeDestroy(
     free(p_ctx);
 }
 
+static void
+UpdateSurfaceLayout(struct context *p_ctx, enum surface_layout layout)
+{
+    switch (layout)
+    {
+        case SURFACE_BEST_FIT:
+            libvlc_video_set_aspect_ratio(p_ctx->p_mp, NULL);
+            libvlc_video_set_scale(p_ctx->p_mp, 0);
+            break;
+        case SURFACE_16_9:
+            libvlc_video_set_aspect_ratio(p_ctx->p_mp, "16:9");
+            libvlc_video_set_scale(p_ctx->p_mp, 0);
+            break;
+        case SURFACE_4_3:
+            libvlc_video_set_aspect_ratio(p_ctx->p_mp, "4:3");
+            libvlc_video_set_scale(p_ctx->p_mp, 0);
+            break;
+        case SURFACE_ORIGINAL:
+            libvlc_video_set_aspect_ratio(p_ctx->p_mp, NULL);
+            libvlc_video_set_scale(p_ctx->p_mp, 1);
+            break;
+    }
+}
+
 static bool
 PlayUrl(struct context *p_ctx, const char *psz_url)
 {
@@ -106,6 +140,7 @@ PlayUrl(struct context *p_ctx, const char *psz_url)
     libvlc_media_add_option(p_m, ":codec=mediacodec_ndk,mediacodec_jni,all");
 
     libvlc_media_player_set_media(p_ctx->p_mp, p_m);
+    UpdateSurfaceLayout(p_ctx, surface_layout);
     int i_ret = libvlc_media_player_play(p_ctx->p_mp);
 
     /* Instance is now owned by the media player */
