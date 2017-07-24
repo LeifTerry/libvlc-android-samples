@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -33,6 +34,7 @@ import org.videolan.libvlc.MediaPlayer;
 import java.util.ArrayList;
 
 public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVideoLayoutListener {
+    private static final boolean USE_SURFACE_VIEW = true;
     private static final boolean ENABLE_SUBTITLES = true;
     private static final String TAG = "JavaActivity";
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
@@ -47,6 +49,8 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
     private FrameLayout mVideoSurfaceFrame = null;
     private SurfaceView mVideoSurface = null;
     private SurfaceView mSubtitlesSurface = null;
+    private TextureView mVideoTexture = null;
+    private View mVideoView = null;
 
     private final Handler mHandler = new Handler();
     private View.OnLayoutChangeListener mOnLayoutChangeListener = null;
@@ -72,12 +76,22 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         mMediaPlayer = new MediaPlayer(mLibVLC);
 
         mVideoSurfaceFrame = (FrameLayout) findViewById(R.id.video_surface_frame);
-        mVideoSurface = (SurfaceView) findViewById(R.id.video_surface);
-        if (ENABLE_SUBTITLES) {
-            final ViewStub stub = (ViewStub) findViewById(R.id.subtitles_stub);
-            mSubtitlesSurface = (SurfaceView) stub.inflate();
-            mSubtitlesSurface.setZOrderMediaOverlay(true);
-            mSubtitlesSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        if (USE_SURFACE_VIEW) {
+            ViewStub stub = (ViewStub) findViewById(R.id.surface_stub);
+            mVideoSurface = (SurfaceView) stub.inflate();
+            if (ENABLE_SUBTITLES) {
+                stub = (ViewStub) findViewById(R.id.subtitles_surface_stub);
+                mSubtitlesSurface = (SurfaceView) stub.inflate();
+                mSubtitlesSurface.setZOrderMediaOverlay(true);
+                mSubtitlesSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+            }
+            mVideoView = mVideoSurface;
+        }
+        else
+        {
+            ViewStub stub = (ViewStub) findViewById(R.id.texture_stub);
+            mVideoTexture = (TextureView) stub.inflate();
+            mVideoView = mVideoTexture;
         }
     }
 
@@ -93,9 +107,13 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         super.onStart();
 
         final IVLCVout vlcVout = mMediaPlayer.getVLCVout();
-        vlcVout.setVideoView(mVideoSurface);
-        if (mSubtitlesSurface != null)
-            vlcVout.setSubtitlesView(mSubtitlesSurface);
+        if (mVideoSurface != null) {
+            vlcVout.setVideoView(mVideoSurface);
+            if (mSubtitlesSurface != null)
+                vlcVout.setSubtitlesView(mSubtitlesSurface);
+        }
+        else
+            vlcVout.setVideoView(mVideoTexture);
         vlcVout.attachViews(this);
 
         Media media = new Media(mLibVLC, Uri.parse(SAMPLE_URL));
@@ -208,12 +226,12 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
 
         mMediaPlayer.getVLCVout().setWindowSize(sw, sh);
 
-        ViewGroup.LayoutParams lp = mVideoSurface.getLayoutParams();
+        ViewGroup.LayoutParams lp = mVideoView.getLayoutParams();
         if (mVideoWidth * mVideoHeight == 0) {
             /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
             lp.width  = ViewGroup.LayoutParams.MATCH_PARENT;
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            mVideoSurface.setLayoutParams(lp);
+            mVideoView.setLayoutParams(lp);
             lp = mVideoSurfaceFrame.getLayoutParams();
             lp.width  = ViewGroup.LayoutParams.MATCH_PARENT;
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -289,7 +307,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         // set display size
         lp.width  = (int) Math.ceil(dw * mVideoWidth / mVideoVisibleWidth);
         lp.height = (int) Math.ceil(dh * mVideoHeight / mVideoVisibleHeight);
-        mVideoSurface.setLayoutParams(lp);
+        mVideoView.setLayoutParams(lp);
         if (mSubtitlesSurface != null)
             mSubtitlesSurface.setLayoutParams(lp);
 
@@ -299,7 +317,7 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         lp.height = (int) Math.floor(dh);
         mVideoSurfaceFrame.setLayoutParams(lp);
 
-        mVideoSurface.invalidate();
+        mVideoView.invalidate();
         if (mSubtitlesSurface != null)
             mSubtitlesSurface.invalidate();
     }

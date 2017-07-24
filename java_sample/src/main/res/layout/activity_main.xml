@@ -14,15 +14,23 @@
         android:foregroundGravity="clip_horizontal|clip_vertical"
         tools:ignore="true">
 
-        <SurfaceView
-            android:id="@+id/video_surface"
+        <ViewStub
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout="@layout/surface_view"
+            android:id="@+id/surface_stub" />
 
         <ViewStub
             android:layout_width="1dp"
             android:layout_height="1dp"
-            android:layout="@layout/subtitles_surface"
-            android:id="@+id/subtitles_stub" />
+            android:layout="@layout/surface_view"
+            android:id="@+id/subtitles_surface_stub" />
+
+        <ViewStub
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout="@layout/texture_view"
+            android:id="@+id/texture_stub" />
+
     </FrameLayout>
 </FrameLayout>
