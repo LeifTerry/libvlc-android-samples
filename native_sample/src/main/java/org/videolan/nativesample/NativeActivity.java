@@ -42,7 +42,6 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         if (sInit != -1)
             return sInit == 1;
 
-        System.loadLibrary("c++_shared");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
             try {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1)
@@ -61,7 +60,8 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
         }
 
         try {
-            System.loadLibrary("vlc");
+            System.loadLibrary("vlcjni");
+            System.loadLibrary("jniloader");
             System.loadLibrary("native");
         } catch (UnsatisfiedLinkError ule) {
             Toast.makeText(context, "Can't load vlcjni library: " + ule, Toast.LENGTH_LONG).show();

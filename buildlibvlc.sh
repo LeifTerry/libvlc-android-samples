@@ -28,7 +28,7 @@ LIBVLC_LIBS=`realpath "${rootdir}"/vlc-android/libvlc/jni/libs`
 
 for project in native_sample;do
     for arch in `ls ${LIBVLC_LIBS}`;do
-        if [ ! -f "${LIBVLC_LIBS}/${arch}/libvlc.so" ];then
+        if [ ! -f "${LIBVLC_LIBS}/${arch}/libvlcjni.so" ];then
             continue
         fi
 
