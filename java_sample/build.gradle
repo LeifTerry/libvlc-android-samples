@@ -5,8 +5,10 @@ android {
     buildToolsVersion "23.0.2"
     sourceSets {
         main {
-            jni.srcDirs = [] // Prevent gradle from building native code with ndk; we have our own Makefile for it.
+            jni.srcDirs = []
+            // Prevent gradle from building native code with ndk; we have our own Makefile for it.
             jniLibs.srcDir 'jni/libs' // Where generated .so files are placed
+            assets.srcDirs = ['src/main/assets', '../assets/']
         }
     }
     defaultConfig {

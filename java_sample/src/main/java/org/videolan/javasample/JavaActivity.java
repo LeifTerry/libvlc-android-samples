@@ -31,13 +31,14 @@ import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVideoLayoutListener {
     private static final boolean USE_SURFACE_VIEW = true;
     private static final boolean ENABLE_SUBTITLES = true;
     private static final String TAG = "JavaActivity";
-    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
+    private static final String ASSET_FILENAME = "bbb.m4v";
     private static final int SURFACE_BEST_FIT = 0;
     private static final int SURFACE_FIT_SCREEN = 1;
     private static final int SURFACE_FILL = 2;
@@ -116,9 +117,13 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
             vlcVout.setVideoView(mVideoTexture);
         vlcVout.attachViews(this);
 
-        Media media = new Media(mLibVLC, Uri.parse(SAMPLE_URL));
-        mMediaPlayer.setMedia(media);
-        media.release();
+        try {
+            final Media media = new Media(mLibVLC, getAssets().openFd(ASSET_FILENAME));
+            mMediaPlayer.setMedia(media);
+            media.release();
+        } catch (IOException e) {
+            throw new RuntimeException("Invalid asset folder");
+        }
         mMediaPlayer.play();
 
         if (mOnLayoutChangeListener == null) {
