@@ -41,7 +41,7 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
     static synchronized boolean loadLibraries(Context context) {
         if (sInit != -1)
             return sInit == 1;
-
+/*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
             try {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1)
@@ -58,8 +58,10 @@ public class NativeActivity extends AppCompatActivity implements IVLCVout.Callba
                 Log.w(TAG, "Unable to load the anw library: " + t);
             }
         }
-
+*/
         try {
+            System.loadLibrary("c++_shared");
+            System.loadLibrary("vlc");
             System.loadLibrary("vlcjni");
             System.loadLibrary("jniloader");
             System.loadLibrary("native");

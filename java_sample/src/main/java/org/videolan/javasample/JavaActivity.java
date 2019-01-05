@@ -118,10 +118,12 @@ public class JavaActivity extends AppCompatActivity implements IVLCVout.OnNewVid
         vlcVout.attachViews(this);
 
         try {
-            final Media media = new Media(mLibVLC, getAssets().openFd(ASSET_FILENAME));
+            String videoPath = "rtsp://10.0.0.2:8125/";
+//            final Media media = new Media(mLibVLC, getAssets().openFd(ASSET_FILENAME));
+            final Media media = new Media(mLibVLC, Uri.parse(videoPath));
             mMediaPlayer.setMedia(media);
             media.release();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Invalid asset folder");
         }
         mMediaPlayer.play();
